@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2017, Andreas ten Pas
+ *  Copyright (c) 2018, Andreas ten Pas
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,48 +29,27 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DENSE_LAYER_H
-#define DENSE_LAYER_H
+#ifndef BASE_NET_H
+#define BASE_NET_H
 
 
-#include <Eigen/Dense>
-
-#include <iostream>
 #include <vector>
 
-#include <gpd/layer.h>
 
-
-/** DenseLayer class
- *
- * \brief Dense (fully connected) layer.
- *
- * This class is a dense (fully connected) layer for a neural network.
- *
- */
-class DenseLayer : public Layer
+class BaseNet
 {
   public:
 
-    /**
-     * \brief Contructor.
-     * \param num_units number of units/neurons in this layer
-     */
-    DenseLayer(int num_units) : num_units_(num_units) {first_ = 1;}
+    virtual ~BaseNet() {}
 
     /**
-     * \brief Forward pass.
-     * \return output of forward pass
+     * \brief Forward pass of the network.
+     * \param x input to the network
+     * \return output of the network
      */
-    Eigen::MatrixXf forward(const std::vector<float>& x) const;
+    virtual std::vector<float> forward(const std::vector<float>& x) = 0;
 
-
-  private:
-
-    int num_units_; ///< the number of units
-    int first_;
-    Eigen::MatrixXf H_;
 };
 
 
-#endif /* DENSE_LAYER_H */
+#endif /* BASE_NET_H */

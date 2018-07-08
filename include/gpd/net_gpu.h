@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2017, Andreas ten Pas
+ *  Copyright (c) 2018, Andreas ten Pas
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,48 +29,38 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DENSE_LAYER_H
-#define DENSE_LAYER_H
+#ifndef NET_H
+#define NET_H
 
 
-#include <Eigen/Dense>
+//#include <cublas_v2.h>
 
-#include <iostream>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+
 #include <vector>
 
-#include <gpd/layer.h>
+#include <gpd/base_net.h>
 
 
-/** DenseLayer class
- *
- * \brief Dense (fully connected) layer.
- *
- * This class is a dense (fully connected) layer for a neural network.
- *
- */
-class DenseLayer : public Layer
+class Net : public BaseNet
 {
   public:
 
-    /**
-     * \brief Contructor.
-     * \param num_units number of units/neurons in this layer
-     */
-    DenseLayer(int num_units) : num_units_(num_units) {first_ = 1;}
+    ~Net() {}
 
     /**
-     * \brief Forward pass.
-     * \return output of forward pass
+     * \brief Forward pass of the network.
+     * \param x input to the network
+     * \return output of the network
      */
-    Eigen::MatrixXf forward(const std::vector<float>& x) const;
+    std::vector<float> forward(const std::vector<float>& x);
 
 
   private:
 
-    int num_units_; ///< the number of units
-    int first_;
-    Eigen::MatrixXf H_;
+    void gpuBlasMmul(const float *A, const float *B, float *C, const int m, const int k, const int n);
 };
 
 
-#endif /* DENSE_LAYER_H */
+#endif /* NET_H */

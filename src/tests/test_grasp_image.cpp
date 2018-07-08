@@ -9,6 +9,16 @@
 #include <gpd/lenet.h>
 
 
+#ifdef CUDA
+void cuda()
+{
+  std::cout << "I'm CUDA, the valiant hero!\n";
+}
+#else
+void cuda() {}
+#endif
+
+
 int main(int argc, char* argv[])
 {
   if (argc < 5)
@@ -17,6 +27,8 @@ int main(int argc, char* argv[])
     std::cout << "Usage: rosrun gpd test_grasp_image INPUT_FILE SAMPLE_INDEX DRAW_GRASP_IMAGES LENET_PARAMS_DIR\n";
     return -1;
   }
+
+  cuda();
 
   // View point from which the camera sees the point cloud.
   Eigen::Matrix3Xd view_points(3,1);

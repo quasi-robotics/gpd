@@ -94,10 +94,10 @@ std::vector<float> Lenet::forward(const std::vector<float>& x)
   Eigen::Map<Eigen::VectorXf> f1(P2.data(), P2.size());
 
   // 1st inner product layer
-//  double dense1_start = omp_get_wtime();
+  double dense1_start = omp_get_wtime();
   Eigen::VectorXf::Map(&x_dense1[0], f1.size()) = f1;
   Eigen::MatrixXf H3 = dense1->forward(x_dense1);
-//  std::cout << "DENSE1 runtime: " << omp_get_wtime() - dense1_start << std::endl;
+  std::cout << "DENSE1 runtime: " << omp_get_wtime() - dense1_start << std::endl;
 
   // RELU layer
   H3 = H3.cwiseMax(0);

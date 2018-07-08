@@ -1,6 +1,32 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gpd)
 
+option(UseCUDA "UseCUDA" OFF)
+if(UseCUDA)
+  cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+  enable_language(CUDA)
+  add_definitions(-DCUDA)
+  message("Using CUDA ...")
+    
+  # set(CUDA_SEPARABLE_COMPILATION ON)
+  # set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} ${CUDA_ARCH} -lcublas)
+  
+  # CUDA_ADD_CUBLAS_TO_TARGET("${PROJECT_NAME}")
+  
+  set(CMAKE_CUDA_FLAGS "-lcublas")
+
+  add_library(${PROJECT_NAME}_net src/${PROJECT_NAME}/net_gpu.cu)
+
+  add_executable(test_cuda src/tests/test_cuda.cu)
+  # set_target_properties(test_cuda PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+  target_link_libraries(test_cuda ${PROJECT_NAME}_net)
+
+  # set_target_properties(${PROJECT_NAME}_net PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+  # target_link_libraries(${PROJECT_NAME}_net ${CUDA_LIBRARIES} ${CUBLAS_LIBRARIES})
+else()
+  add_library(${PROJECT_NAME}_net src/${PROJECT_NAME}/net_cpu.cpp)
+endif()
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
