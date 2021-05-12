@@ -23,7 +23,7 @@ include_directories(${gpg_INCLUDE_DIRS})
 
 # Caffe
 option(USE_CAFFE "Use Caffe." OFF)
-if(USE_CAFFE STREQUAL "ON")
+if(USE_CAFFE)
   message(INFO " USE_CAFFE")
   find_package(Caffe)
   include_directories(${Caffe_INCLUDE_DIRS})
@@ -33,7 +33,7 @@ endif()
 
 # OpenVINO
 option(USE_OPENVINO "Use Intel Open VINO." OFF)
-if(USE_OPENVINO STREQUAL "ON")
+if(USE_OPENVINO)
   message(INFO " USE_OPENVINO")
   find_package(InferenceEngine)
   if (NOT InferenceEngine_FOUND)
