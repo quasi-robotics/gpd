@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 set(GPD_LIB grasp_pose_detection PARENT_SCOPE)
 project(grasp_pose_detection)
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
 # PCL
 find_package(PCL REQUIRED)
@@ -18,6 +22,7 @@ find_path(gpg_INCLUDE_DIRS gpg/grasp.h)
 include_directories(${gpg_INCLUDE_DIRS})
 
 # Caffe
+option(USE_CAFFE "Use Caffe." OFF)
 if(USE_CAFFE STREQUAL "ON")
   message(INFO " USE_CAFFE")
   find_package(Caffe)
@@ -27,6 +32,7 @@ if(USE_CAFFE STREQUAL "ON")
 endif()
 
 # OpenVINO
+option(USE_OPENVINO "Use Intel Open VINO." OFF)
 if(USE_OPENVINO STREQUAL "ON")
   message(INFO " USE_OPENVINO")
   find_package(InferenceEngine)
@@ -47,7 +53,7 @@ elseif (USE_CAFFE)
 endif()
 
 ## Set compiler optimization flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fopenmp -flto -Wno-deprecated -Wenum-compare -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fopenmp -flto -Wno-deprecated -Wenum-compare")
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
