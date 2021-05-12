@@ -69,12 +69,11 @@ class OpenVINOClassifier : public Classifier
     int getBatchSize() const;
 
   private:
-    static std::map<Classifier::Device, InferenceEngine::TargetDevice> device_map_;
+    static std::map<Classifier::Device, const char*> device_map_;
     std::vector<cv::Mat> batch_image_list_;
     InferenceEngine::Blob::Ptr input_blob_, output_blob_;
     InferenceEngine::CNNNetwork network_;
     InferenceEngine::InferRequest infer_request_;
-    InferenceEngine::InferencePlugin plugin_;
 };
 
 #endif /* OPENVINO_CLASSIFIER_H_ */
