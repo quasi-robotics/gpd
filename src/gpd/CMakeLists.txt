@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
+if(USE_CAFFE)
+  cmake_minimum_required(VERSION 3.18)
+else()
+  cmake_minimum_required(VERSION 3.11)
+endif()
 set(GPD_LIB grasp_pose_detection PARENT_SCOPE)
 project(grasp_pose_detection)
 
@@ -29,6 +33,8 @@ if(USE_CAFFE)
   include_directories(${Caffe_INCLUDE_DIRS})
   add_definitions(-DUSE_CAFFE)
   add_definitions(${Caffe_DEFINITIONS})
+  find_package(Boost REQUIRED COMPONENTS thread system python38)
+  add_library(Boost::python ALIAS Boost::python38)
 endif()
 
 # OpenVINO

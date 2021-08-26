@@ -101,7 +101,7 @@ bool DataGenerator::createGraspImages(CloudCamera& cloud_cam, std::vector<Grasp>
 
   if (candidates.size() == 0)
   {
-    ROS_ERROR("No grasp candidates found!");
+    std::cout << ("No grasp candidates found!") << std::endl;
     return false;
   }
 

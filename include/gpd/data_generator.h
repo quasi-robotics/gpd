@@ -10,7 +10,7 @@
 #include <opencv2/opencv.hpp>
 
 // ROS
-#include <ros/ros.h>
+//#include <ros/ros.h>
 
 // Custom
 #include <gpg/cloud_camera.h>
