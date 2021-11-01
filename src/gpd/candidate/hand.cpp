@@ -36,6 +36,14 @@ void Hand::construct(const FingerHand &finger_hand) {
       break;
     }
   }
+
+  Eigen::Vector3d pos_top, pos_bottom, pos_surface;
+  pos_surface << finger_hand.getSurface(), finger_hand.getCenter(), 0.0;
+  pos_bottom << getBottom(), finger_hand.getCenter(), 0.0;
+  pos_top << getTop(), finger_hand.getCenter(), 0.0;
+  pose_.surface_ = getFrame() * pos_surface + sample_;
+  pose_.bottom_ = getFrame() * pos_bottom + sample_;
+  pose_.top_ = getFrame() * pos_top + sample_;
 }
 
 void Hand::calculateGraspPositions(const FingerHand &finger_hand) {

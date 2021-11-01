@@ -69,6 +69,13 @@ struct BoundingBox {
   double bottom_;
 };
 
+struct GraspPose
+{
+  Eigen::Vector3d surface_; ///< the centered grasp position on the object surface
+  Eigen::Vector3d bottom_; ///< the centered grasp position at the base of the robot hand
+  Eigen::Vector3d top_; ///< the centered grasp position between the fingertips of the robot hand
+};
+
 /**
  *
  * \brief Grasp represented as a robot hand pose
@@ -169,6 +176,33 @@ class Hand {
    * \return the width of the object contained in the grasp
    */
   double getGraspWidth() const { return grasp_width_; }
+
+ /**
+   * \brief Return the the centered grasp position at the base of the robot hand.
+   * \return 3x1 grasp position at the base of the robot hand
+   */
+  const Eigen::Vector3d& getGraspBottom() const
+  {
+    return pose_.bottom_;
+  }
+
+    /**
+   * \brief Return the grasp position between the end of the finger tips projected onto the back of the hand.
+   * \return 3x1 grasp position between the end of the finger tips projected onto the back of the hand
+   */
+  const Eigen::Vector3d& getGraspSurface() const
+  {
+    return pose_.surface_;
+  }
+
+  /**
+   * \brief Return the the centered grasp position between the fingertips of the robot hand.
+   * \return 3x1 grasp position between the fingertips
+   */
+  const Eigen::Vector3d& getGraspTop() const
+  {
+    return pose_.top_;
+  }
 
   /**
    * \brief Return whether the grasp is indeterminate.
@@ -274,6 +308,7 @@ class Hand {
   int finger_placement_index_;  ///< index of the finger placement that resulted
                                 /// in this grasp
   BoundingBox closing_box_;     ///< defines region surrounded by fingers
+  GraspPose pose_; ///< the grasp pose
 };
 
 }  // namespace candidate
