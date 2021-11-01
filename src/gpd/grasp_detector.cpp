@@ -15,107 +15,61 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
   if (hand_geometry_filename == "0") {
     hand_geometry_filename = config_filename;
   }
-  candidate::HandGeometry hand_geom(hand_geometry_filename);
-  std::cout << hand_geom;
 
+  GraspDetectionParameters param;
   // Read plotting parameters.
-  plot_normals_ = config_file.getValueOfKey<bool>("plot_normals", false);
-  plot_samples_ = config_file.getValueOfKey<bool>("plot_samples", true);
-  plot_candidates_ = config_file.getValueOfKey<bool>("plot_candidates", false);
-  plot_filtered_candidates_ =
+  param.plot_normals_ = config_file.getValueOfKey<bool>("plot_normals", false);
+  param.plot_samples_ = config_file.getValueOfKey<bool>("plot_samples", true);
+  param.plot_candidates_ = config_file.getValueOfKey<bool>("plot_candidates", false);
+  param.plot_filtered_candidates_ =
       config_file.getValueOfKey<bool>("plot_filtered_candidates", false);
-  plot_valid_grasps_ =
+  param.plot_valid_grasps_ =
       config_file.getValueOfKey<bool>("plot_valid_grasps", false);
-  plot_clustered_grasps_ =
+  param.plot_clustered_grasps_ =
       config_file.getValueOfKey<bool>("plot_clustered_grasps", false);
-  plot_selected_grasps_ =
+  param.plot_selected_grasps_ =
       config_file.getValueOfKey<bool>("plot_selected_grasps", false);
-  printf("============ PLOTTING ========================\n");
-  printf("plot_normals: %s\n", plot_normals_ ? "true" : "false");
-  printf("plot_samples %s\n", plot_samples_ ? "true" : "false");
-  printf("plot_candidates: %s\n", plot_candidates_ ? "true" : "false");
-  printf("plot_filtered_candidates: %s\n",
-         plot_filtered_candidates_ ? "true" : "false");
-  printf("plot_valid_grasps: %s\n", plot_valid_grasps_ ? "true" : "false");
-  printf("plot_clustered_grasps: %s\n",
-         plot_clustered_grasps_ ? "true" : "false");
-  printf("plot_selected_grasps: %s\n",
-         plot_selected_grasps_ ? "true" : "false");
-  printf("==============================================\n");
 
   // Create object to generate grasp candidates.
   candidate::CandidatesGenerator::Parameters generator_params;
-  generator_params.num_samples_ =
+  param.generator_params.num_samples_ =
       config_file.getValueOfKey<int>("num_samples", 1000);
-  generator_params.num_threads_ =
+  param.generator_params.num_threads_ =
       config_file.getValueOfKey<int>("num_threads", 1);
-  generator_params.remove_statistical_outliers_ =
+  param.generator_params.remove_statistical_outliers_ =
       config_file.getValueOfKey<bool>("remove_outliers", false);
-  generator_params.sample_above_plane_ =
+  param.generator_params.sample_above_plane_ =
       config_file.getValueOfKey<bool>("sample_above_plane", false);
-  generator_params.voxelize_ =
+  param.generator_params.voxelize_ =
       config_file.getValueOfKey<bool>("voxelize", true);
-  generator_params.voxel_size_ =
+  param.generator_params.voxel_size_ =
       config_file.getValueOfKey<double>("voxel_size", 0.003);
-  generator_params.normals_radius_ =
+  param.generator_params.normals_radius_ =
       config_file.getValueOfKey<double>("normals_radius", 0.03);
-  generator_params.refine_normals_k_ =
+  param.generator_params.refine_normals_k_ =
       config_file.getValueOfKey<int>("refine_normals_k", 0);
-  generator_params.workspace_ =
+  param.generator_params.workspace_ =
       config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
 
-  candidate::HandSearch::Parameters hand_search_params;
-  hand_search_params.hand_geometry_ = hand_geom;
-  hand_search_params.nn_radius_frames_ =
+  param.hand_search_params.hand_geometry_ = candidate::HandGeometry(hand_geometry_filename);
+  param.hand_search_params.nn_radius_frames_ =
       config_file.getValueOfKey<double>("nn_radius", 0.01);
-  hand_search_params.num_samples_ =
+  param.hand_search_params.num_samples_ =
       config_file.getValueOfKey<int>("num_samples", 1000);
-  hand_search_params.num_threads_ =
+  param.hand_search_params.num_threads_ =
       config_file.getValueOfKey<int>("num_threads", 1);
-  hand_search_params.num_orientations_ =
+  param.hand_search_params.num_orientations_ =
       config_file.getValueOfKey<int>("num_orientations", 8);
-  hand_search_params.num_finger_placements_ =
+  param.hand_search_params.num_finger_placements_ =
       config_file.getValueOfKey<int>("num_finger_placements", 10);
-  hand_search_params.deepen_hand_ =
+  param.hand_search_params.deepen_hand_ =
       config_file.getValueOfKey<bool>("deepen_hand", true);
-  hand_search_params.hand_axes_ =
+  param.hand_search_params.hand_axes_ =
       config_file.getValueOfKeyAsStdVectorInt("hand_axes", "2");
-  hand_search_params.friction_coeff_ =
+  param.hand_search_params.friction_coeff_ =
       config_file.getValueOfKey<double>("friction_coeff", 20.0);
-  hand_search_params.min_viable_ =
+  param.hand_search_params.min_viable_ =
       config_file.getValueOfKey<int>("min_viable", 6);
-  candidates_generator_ = std::make_unique<candidate::CandidatesGenerator>(
-      generator_params, hand_search_params);
-
-  printf("============ CLOUD PREPROCESSING =============\n");
-  printf("voxelize: %s\n", generator_params.voxelize_ ? "true" : "false");
-  printf("voxel_size: %.3f\n", generator_params.voxel_size_);
-  printf("remove_outliers: %s\n",
-         generator_params.remove_statistical_outliers_ ? "true" : "false");
-  printStdVector(generator_params.workspace_, "workspace");
-  printf("sample_above_plane: %s\n",
-         generator_params.sample_above_plane_ ? "true" : "false");
-  printf("normals_radius: %.3f\n", generator_params.normals_radius_);
-  printf("refine_normals_k: %d\n", generator_params.refine_normals_k_);
-  printf("==============================================\n");
-
-  printf("============ CANDIDATE GENERATION ============\n");
-  printf("num_samples: %d\n", hand_search_params.num_samples_);
-  printf("num_threads: %d\n", hand_search_params.num_threads_);
-  printf("nn_radius: %3.2f\n", hand_search_params.nn_radius_frames_);
-  printStdVector(hand_search_params.hand_axes_, "hand axes");
-  printf("num_orientations: %d\n", hand_search_params.num_orientations_);
-  printf("num_finger_placements: %d\n",
-         hand_search_params.num_finger_placements_);
-  printf("deepen_hand: %s\n",
-         hand_search_params.deepen_hand_ ? "true" : "false");
-  printf("friction_coeff: %3.2f\n", hand_search_params.friction_coeff_);
-  printf("min_viable: %d\n", hand_search_params.min_viable_);
-  printf("==============================================\n");
-
-  // TODO: Set the camera position.
-  //  Eigen::Matrix3Xd view_points(3,1);
-  //  view_points << camera_position[0], camera_position[1], camera_position[2];
 
   // Read grasp image parameters.
   std::string image_geometry_filename =
@@ -123,70 +77,159 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
   if (image_geometry_filename == "0") {
     image_geometry_filename = config_filename;
   }
-  descriptor::ImageGeometry image_geom(image_geometry_filename);
-  std::cout << image_geom;
+  param.image_params = descriptor::ImageGeometry(image_geometry_filename);
 
-  // Read classification parameters and create classifier.
-  std::string model_file = config_file.getValueOfKeyAsString("model_file", "");
-  std::string weights_file =
-      config_file.getValueOfKeyAsString("weights_file", "");
-  if (!model_file.empty() || !weights_file.empty()) {
-    int device = config_file.getValueOfKey<int>("device", 0);
-    int batch_size = config_file.getValueOfKey<int>("batch_size", 1);
-    classifier_ = net::Classifier::create(
-        model_file, weights_file, static_cast<net::Classifier::Device>(device),
-        batch_size);
-    min_score_ = config_file.getValueOfKey<int>("min_score", 0);
-    printf("============ CLASSIFIER ======================\n");
-    printf("model_file: %s\n", model_file.c_str());
-    printf("weights_file: %s\n", weights_file.c_str());
-    printf("batch_size: %d\n", batch_size);
-    printf("==============================================\n");
+  param.model_file_ = config_file.getValueOfKeyAsString("model_file", "");
+  param.weights_file_ = config_file.getValueOfKeyAsString("weights_file", "");
+  
+  if (!param.model_file_.empty() || !param.weights_file_.empty()) {
+    param.device_ = config_file.getValueOfKey<int>("device", 0);
+    param.batch_size_ = config_file.getValueOfKey<int>("batch_size", 1);
   }
-
+  
   // Read additional grasp image creation parameters.
-  bool remove_plane = config_file.getValueOfKey<bool>(
+  param.remove_plane_ =  config_file.getValueOfKey<bool>(
       "remove_plane_before_image_calculation", false);
 
-  // Create object to create grasp images from grasp candidates (used for
-  // classification).
-  image_generator_ = std::make_unique<descriptor::ImageGenerator>(
-      image_geom, hand_search_params.num_threads_,
-      hand_search_params.num_orientations_, false, remove_plane);
-
   // Read grasp filtering parameters based on robot workspace and gripper width.
-  workspace_grasps_ = config_file.getValueOfKeyAsStdVectorDouble(
+  param.workspace_grasps_ = config_file.getValueOfKeyAsStdVectorDouble(
       "workspace_grasps", "-1 1 -1 1 -1 1");
-  min_aperture_ = config_file.getValueOfKey<double>("min_aperture", 0.0);
-  max_aperture_ = config_file.getValueOfKey<double>("max_aperture", 0.085);
-  printf("============ CANDIDATE FILTERING =============\n");
-  printStdVector(workspace_grasps_, "candidate_workspace");
-  printf("min_aperture: %3.4f\n", min_aperture_);
-  printf("max_aperture: %3.4f\n", max_aperture_);
-  printf("==============================================\n");
 
+  param.min_aperture_ = config_file.getValueOfKey<double>("min_aperture", 0.0);
+  param.max_aperture_ = config_file.getValueOfKey<double>("max_aperture", 0.085);
+  
   // Read grasp filtering parameters based on approach direction.
-  filter_approach_direction_ =
+  param.filter_approach_direction_ =
       config_file.getValueOfKey<bool>("filter_approach_direction", false);
-  std::vector<double> approach =
-      config_file.getValueOfKeyAsStdVectorDouble("direction", "1 0 0");
-  direction_ << approach[0], approach[1], approach[2];
-  thresh_rad_ = config_file.getValueOfKey<double>("thresh_rad", 2.3);
-
+  param.direction_ = config_file.getValueOfKeyAsStdVectorDouble("direction", "1 0 0");
+  param.thresh_rad_ = config_file.getValueOfKey<double>("thresh_rad", 2.3);
+  
   // Read clustering parameters.
-  int min_inliers = config_file.getValueOfKey<int>("min_inliers", 1);
-  clustering_ = std::make_unique<Clustering>(min_inliers);
-  cluster_grasps_ = min_inliers > 0 ? true : false;
-  printf("============ CLUSTERING ======================\n");
-  printf("min_inliers: %d\n", min_inliers);
-  printf("==============================================\n\n");
+  param.min_inliers_ = config_file.getValueOfKey<int>("min_inliers", 1);
 
   // Read grasp selection parameters.
-  num_selected_ = config_file.getValueOfKey<int>("num_selected", 100);
+  param.num_selected_ = config_file.getValueOfKey<int>("num_selected", 100);
 
-  // Create plotter.
-  plotter_ = std::make_unique<util::Plot>(hand_search_params.hand_axes_.size(),
-                                          hand_search_params.num_orientations_);
+  init(param);
+}
+
+GraspDetector::GraspDetector(GraspDetectionParameters& param) {
+  Eigen::initParallel();
+  init(param);
+}
+
+void GraspDetector::init(GraspDetectionParameters& param)
+{
+    std::cout << param.hand_search_params.hand_geometry_;
+
+    //TODO merge with GraspDetector(const std::string &config_filename)
+    //Read plotting parameters.
+    plot_normals_ = param.plot_normals_;
+    plot_samples_ = param.plot_samples_;
+    plot_candidates_ = param.plot_candidates_;
+    plot_filtered_candidates_ = param.plot_filtered_grasps_;
+    plot_valid_grasps_ = plot_valid_grasps_;
+    plot_clustered_grasps_ = param.plot_clusters_;
+    plot_selected_grasps_ = plot_selected_grasps_;
+    printf("============ PLOTTING ========================\n");
+    printf("plot_normals: %s\n", plot_normals_ ? "true" : "false");
+    printf("plot_samples %s\n", plot_samples_ ? "true" : "false");
+    printf("plot_candidates: %s\n", plot_candidates_ ? "true" : "false");
+    printf("plot_filtered_candidates: %s\n",
+           plot_filtered_candidates_ ? "true" : "false");
+    printf("plot_valid_grasps: %s\n", plot_valid_grasps_ ? "true" : "false");
+    printf("plot_clustered_grasps: %s\n",
+           plot_clustered_grasps_ ? "true" : "false");
+    printf("plot_selected_grasps: %s\n",
+           plot_selected_grasps_ ? "true" : "false");
+    printf("==============================================\n");
+
+    // // Create object to generate grasp candidates.
+    candidates_generator_ = std::make_unique<candidate::CandidatesGenerator>(
+            param.generator_params, param.hand_search_params);
+
+    printf("============ CLOUD PREPROCESSING =============\n");
+    printf("voxelize: %s\n", param.generator_params.voxelize_ ? "true" : "false");
+    printf("voxel_size: %.3f\n", param.generator_params.voxel_size_);
+    printf("remove_outliers: %s\n",
+           param.generator_params.remove_statistical_outliers_ ? "true" : "false");
+    printStdVector(param.generator_params.workspace_, "workspace");
+    printf("sample_above_plane: %s\n",
+           param.generator_params.sample_above_plane_ ? "true" : "false");
+    printf("normals_radius: %.3f\n", param.generator_params.normals_radius_);
+    printf("refine_normals_k: %d\n", param.generator_params.refine_normals_k_);
+    printf("==============================================\n");
+
+    printf("============ CANDIDATE GENERATION ============\n");
+    printf("num_samples: %d\n", param.hand_search_params.num_samples_);
+    printf("num_threads: %d\n", param.hand_search_params.num_threads_);
+    printf("nn_radius: %3.2f\n", param.hand_search_params.nn_radius_frames_);
+    printStdVector(param.hand_search_params.hand_axes_, "hand axes");
+    printf("num_orientations: %d\n", param.hand_search_params.num_orientations_);
+    printf("num_finger_placements: %d\n",
+           param.hand_search_params.num_finger_placements_);
+    printf("deepen_hand: %s\n",
+           param.hand_search_params.deepen_hand_ ? "true" : "false");
+    printf("friction_coeff: %3.2f\n", param.hand_search_params.friction_coeff_);
+    printf("min_viable: %d\n", param.hand_search_params.min_viable_);
+    printf("==============================================\n");
+
+    std::cout << param.image_params;
+    //Read classification parameters and create classifier.
+    if (!param.model_file_.empty() || !param.weights_file_.empty())
+    {
+        classifier_ = net::Classifier::create(
+                param.model_file_, param.weights_file_, static_cast<net::Classifier::Device>(param.device_),
+                param.batch_size_);
+        min_score_ = param.min_score_diff_;
+        printf("============ CLASSIFIER ======================\n");
+        printf("model_file: %s\n", param.model_file_.c_str());
+        printf("weights_file: %s\n", param.weights_file_.c_str());
+        printf("batch_size: %d\n", param.batch_size_);
+        printf("min_score_: %f\n", min_score_);
+        printf("==============================================\n");
+        printf("thresh_rad_: %3.4f\n", param.thresh_rad_);
+    }
+
+    //Create object to create grasp images from grasp candidates (used for classification).
+    image_generator_ = std::make_unique<descriptor::ImageGenerator>(
+            param.image_params, param.hand_search_params.num_threads_,
+            param.hand_search_params.num_orientations_, false, param.remove_plane_);
+
+    // Read grasp filtering parameters based on robot workspace and gripper width.
+    workspace_grasps_ = param.workspace_grasps_;
+    min_aperture_ = param.min_aperture_;
+    max_aperture_ = param.max_aperture_;
+
+    printf("============ CANDIDATE FILTERING =============\n");
+    printStdVector(workspace_grasps_, "candidate_workspace");
+    printf("min_aperture: %3.4f\n", min_aperture_);
+    printf("max_aperture: %3.4f\n", max_aperture_);
+    printf("==============================================\n");
+
+    // // Read grasp filtering parameters based on approach direction.
+    direction_ << param.direction_[0], param.direction_[1], param.direction_[2];
+    thresh_rad_ = param.thresh_rad_;
+
+    printf("filter_approach_direction_ = %d\n", filter_approach_direction_);
+
+    for(int i=0; i<direction_.size(); ++i)
+    {
+        printf("direction = %f\n", direction_[i]);
+    }
+
+    // Read clustering parameters.
+    clustering_ = std::make_unique<Clustering>(param.min_inliers_);
+    cluster_grasps_ = param.min_inliers_ > 0;
+    printf("============ CLUSTERING ======================\n");
+    printf("min_inliers: %d\n", param.min_inliers_);
+    printf("==============================================\n\n");
+    // // Read grasp selection parameters.
+    num_selected_ = param.num_selected_;
+
+    // // Create plotter.
+    plotter_ = std::make_unique<util::Plot>(param.hand_search_params.hand_axes_.size(),
+                                            param.hand_search_params.num_orientations_);
 }
 
 std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
