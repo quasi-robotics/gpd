@@ -64,10 +64,7 @@ class OpenVinoClassifier : public Classifier {
    * \param model_dir The directory that contains the openvino network model
    * \param device The target device where the computation executes
    */
-  OpenVinoClassifier(const std::string& model_file,
-                     const std::string& weights_file,
-                     Classifier::Device device,
-                     int batch_size);
+  OpenVinoClassifier(Classifier::Device device);
 
   /**
    * \brief Classify grasp candidates as viable grasps or not.
@@ -84,13 +81,11 @@ class OpenVinoClassifier : public Classifier {
   int getBatchSize() const;
 
  private:
-  static std::map<Classifier::Device, InferenceEngine::TargetDevice>
-      device_map_;
+static std::map<Classifier::Device, const char*> device_map_;
   std::vector<cv::Mat> batch_image_list_;
   InferenceEngine::Blob::Ptr input_blob_, output_blob_;
   InferenceEngine::CNNNetwork network_;
   InferenceEngine::InferRequest infer_request_;
-  InferenceEngine::InferencePlugin plugin_;
 };
 
 }  // namespace net

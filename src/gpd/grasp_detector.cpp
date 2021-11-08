@@ -175,21 +175,18 @@ void GraspDetector::init(GraspDetectionParameters& param)
     printf("==============================================\n");
 
     std::cout << param.image_params;
-    //Read classification parameters and create classifier.
-    if (!param.model_file_.empty() || !param.weights_file_.empty())
-    {
-        classifier_ = net::Classifier::create(
+ 
+     classifier_ = net::Classifier::create(
                 param.model_file_, param.weights_file_, static_cast<net::Classifier::Device>(param.device_),
                 param.batch_size_);
-        min_score_ = param.min_score_diff_;
-        printf("============ CLASSIFIER ======================\n");
-        printf("model_file: %s\n", param.model_file_.c_str());
-        printf("weights_file: %s\n", param.weights_file_.c_str());
-        printf("batch_size: %d\n", param.batch_size_);
-        printf("min_score_: %f\n", min_score_);
-        printf("==============================================\n");
-        printf("thresh_rad_: %3.4f\n", param.thresh_rad_);
-    }
+    min_score_ = param.min_score_diff_;
+    printf("============ CLASSIFIER ======================\n");
+    printf("model_file: %s\n", param.model_file_.c_str());
+    printf("weights_file: %s\n", param.weights_file_.c_str());
+    printf("batch_size: %d\n", param.batch_size_);
+    printf("min_score_: %f\n", min_score_);
+    printf("==============================================\n");
+    printf("thresh_rad_: %3.4f\n", param.thresh_rad_);
 
     //Create object to create grasp images from grasp candidates (used for classification).
     image_generator_ = std::make_unique<descriptor::ImageGenerator>(
