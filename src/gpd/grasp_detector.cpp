@@ -128,9 +128,9 @@ void GraspDetector::init(GraspDetectionParameters& param)
     plot_samples_ = param.plot_samples_;
     plot_candidates_ = param.plot_candidates_;
     plot_filtered_candidates_ = param.plot_filtered_grasps_;
-    plot_valid_grasps_ = plot_valid_grasps_;
+    plot_valid_grasps_ = param.plot_valid_grasps_;
     plot_clustered_grasps_ = param.plot_clusters_;
-    plot_selected_grasps_ = plot_selected_grasps_;
+    plot_selected_grasps_ = param.plot_selected_grasps_;
     printf("============ PLOTTING ========================\n");
     printf("plot_normals: %s\n", plot_normals_ ? "true" : "false");
     printf("plot_samples %s\n", plot_samples_ ? "true" : "false");
