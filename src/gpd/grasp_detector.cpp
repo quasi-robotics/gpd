@@ -205,11 +205,12 @@ void GraspDetector::init(GraspDetectionParameters& param)
     printf("==============================================\n");
 
     // // Read grasp filtering parameters based on approach direction.
+    filter_approach_direction_ = param.filter_approach_direction_;
     direction_ << param.direction_[0], param.direction_[1], param.direction_[2];
     thresh_rad_ = param.thresh_rad_;
 
     printf("filter_approach_direction_ = %d\n", filter_approach_direction_);
-
+    printf("thresh_rad_ = %f\n", thresh_rad_);
     for(int i=0; i<direction_.size(); ++i)
     {
         printf("direction = %f\n", direction_[i]);
