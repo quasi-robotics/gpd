@@ -3,6 +3,14 @@ project(gpd)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 14)
 
+find_package(Boost REQUIRED COMPONENTS
+      system
+      thread
+      python
+      system filesystem date_time iostreams regex
+      )
+
+
 # Eigen library
 include_directories(${EIGEN3_INCLUDE_DIR})
 
