@@ -51,7 +51,7 @@ OpenVinoClassifier::OpenVinoClassifier(Classifier::Device device)
   infer_request_ = core.LoadNetwork(network_, device_map_[device], {}).CreateInferRequest();
   input_blob_ = infer_request_.GetBlob(input_name);
   output_blob_ = infer_request_.GetBlob(output_name);
-
+/*
   // -------------------------Preparing the input blob buffer-----------------------------------------------------------
   auto input_data = input_blob_->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
   batch_image_list_.clear();
@@ -61,6 +61,7 @@ OpenVinoClassifier::OpenVinoClassifier(Classifier::Device device)
     batch_image_list_.push_back(img);
     input_data += input_tensor_desc.getDims()[0] * input_tensor_desc.getDims()[1];
   }
+*/
 }
 
 std::vector<float> OpenVinoClassifier::classifyImages(
@@ -74,6 +75,7 @@ std::vector<float> OpenVinoClassifier::classifyImages(
     size_t channels = dims[1];
     size_t rows = dims[2];
     size_t cols = dims[3];
+    std::cout << "preparing network input: " << item.first << ", channels: " << channels << ", rows: " << rows << ", cols: " << cols << ", dim[0]: " << dims[0] << ", batchSize: " << getBatchSize() << std::endl;
     size_t image_size = rows * cols;
     auto data =
         input->buffer().as<PrecisionTrait<Precision::FP32>::value_type *>();
@@ -113,9 +115,10 @@ std::vector<float> OpenVinoClassifier::classifyImages(
       auto output_data =
           output_blob_->buffer()
               .as<PrecisionTrait<Precision::FP32>::value_type *>();
-      const int resultsCnt = output_blob_->size() / getBatchSize();
+      //const int resultsCnt = output_blob_->size() / getBatchSize();
 
       for (int j = 0; j < n; j++) {
+        std::cout << "positive score: " << output_data[2 * j + 1] << ", negative score: " << output_data[2 * j] << "\n";
         predictions.push_back(output_data[2 * j + 1] - output_data[2 * j]);
       }
     }
