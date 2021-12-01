@@ -33,7 +33,7 @@ OpenVinoClassifier::OpenVinoClassifier(Classifier::Device device)
   default:
     throw std::exception();
   }
-  network_.setBatchSize(1);
+  network_.setBatchSize(100);
 
   // -----------------------------Prepare input blobs-------------------------------------------------------------------
   auto input_info = network_.getInputsInfo().begin()->second;
