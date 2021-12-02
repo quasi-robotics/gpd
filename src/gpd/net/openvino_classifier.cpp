@@ -11,13 +11,13 @@ namespace
   {
     if(device == Classifier::Device::eCPU)
     {
-      out_model_xml = std::string(MODELS_DIR) + "/fp32/bottles_boxes_cans_5xNeg.xml";
-      out_trained_file = std::string(MODELS_DIR) + "/fp32/bottles_boxes_cans_5xNeg.bin";
+      out_model_xml = std::string(MODELS_DIR) + "/fp32/single_view_15_channels.xml";
+      out_trained_file = std::string(MODELS_DIR) + "/fp32/single_view_15_channels.bin";
     }
     else if(device == Classifier::Device::eVPU || device == Classifier::Device::eVPU)
     {
-      out_model_xml = std::string(MODELS_DIR) + "/fp16/bottles_boxes_cans_5xNeg.xml";
-      out_trained_file = std::string(MODELS_DIR) + "/fp16/bottles_boxes_cans_5xNeg.bin";
+      out_model_xml = std::string(MODELS_DIR) + "/fp16/single_view_15_channels.xml";
+      out_trained_file = std::string(MODELS_DIR) + "/fp16/single_view_15_channels.bin";
     }
     else
     {
