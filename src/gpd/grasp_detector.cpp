@@ -187,6 +187,7 @@ void GraspDetector::init(GraspDetectionParameters& param)
     printf("min_score_: %f\n", min_score_);
     printf("==============================================\n");
     printf("thresh_rad_: %3.4f\n", param.thresh_rad_);
+    printf("device_: %d\n", param.device_);
 
     //Create object to create grasp images from grasp candidates (used for classification).
     image_generator_ = std::make_unique<descriptor::ImageGenerator>(

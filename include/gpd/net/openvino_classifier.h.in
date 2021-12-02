@@ -64,7 +64,11 @@ class OpenVinoClassifier : public Classifier {
    * \param model_dir The directory that contains the openvino network model
    * \param device The target device where the computation executes
    */
-  OpenVinoClassifier(Classifier::Device device);
+  OpenVinoClassifier(
+    Classifier::Device device,
+    const size_t batch_size,
+    const std::string& model_file,
+    const std::string& trained_file);
 
   /**
    * \brief Classify grasp candidates as viable grasps or not.
