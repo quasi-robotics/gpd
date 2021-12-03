@@ -138,8 +138,8 @@ std::vector<float> OpenVinoClassifier::classifyImages(
       //const int resultsCnt = output_blob_->size() / getBatchSize();
 
       for (int j = 0; j < n; j++) {
-        std::cout << "positive score: " << output_data[2 * j + 1] << ", negative score: " << output_data[2 * j] << "\n";
-        predictions.push_back(output_data[2 * j + 1] - output_data[2 * j]);
+        std::cout << "positive score: " << output_data[2 * j + 1] << ", negative score: " << output_data[2 * j] << ", resultant score: " << output_data[2 * j + 1] - output_data[2 * j] << "\n";
+        predictions.push_back(-(output_data[2 * j + 1] - output_data[2 * j]));
       }
     }
   }
