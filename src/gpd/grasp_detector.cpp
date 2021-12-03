@@ -455,7 +455,8 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::selectGrasps(
 
   for (int i = 0; i < middle; i++) {
     hands_out.push_back(std::move(hands[i]));
-    printf(" grasp #%d, score: %3.4f\n", i, hands_out[i]->getScore());
+    printf(" grasp #%d, score: %3.4f, approach: [%f, %f, %f]\n", i, hands_out[i]->getScore(),
+           hands_out[i]->getApproach()[0], hands_out[i]->getApproach()[1], hands_out[i]->getApproach()[2]);
   }
 
   return hands_out;
@@ -478,6 +479,8 @@ GraspDetector::filterGraspsDirection(
       if (is_valid(j)) {
         double angle = acos(direction.transpose() * hands[j]->getApproach());
         if (angle > thresh_rad) {
+          printf(" filtering out grasp #%d with approach: [%f, %f, %f], angle %f relative to [%f, %f, %f]\n", i, hands[j]->getApproach()[0], hands[j]->getApproach()[1], hands[j]->getApproach()[2],
+                 angle, direction.transpose().x(), direction.transpose().y(), direction.transpose().z());
           is_valid(j) = false;
         } else {
           remaining++;
