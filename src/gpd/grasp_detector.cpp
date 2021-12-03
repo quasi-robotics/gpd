@@ -84,7 +84,7 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
   
   if (!param.model_file_.empty() || !param.weights_file_.empty()) {
     param.device_ = config_file.getValueOfKey<int>("device", 0);
-    param.batch_size_ = config_file.getValueOfKey<int>("batch_size", 1);
+    param.batch_size_ = config_file.getValueOfKey<int>("batch_size", 100);
   }
   
   // Read additional grasp image creation parameters.

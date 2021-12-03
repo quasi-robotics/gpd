@@ -63,7 +63,7 @@ class Classifier {
   static std::shared_ptr<Classifier> create(const std::string &model_file,
                                             const std::string &weights_file,
                                             Device device = Device::eCPU,
-                                            int batch_size = 1);
+                                            int batch_size = 100);
 
   /**
    * \brief Classify grasp candidates as viable grasps or not.
