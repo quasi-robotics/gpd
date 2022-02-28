@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(gpd)
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost REQUIRED COMPONENTS
       system
@@ -35,7 +35,9 @@ find_package(OpenCV REQUIRED)
 
 #set(CMAKE_CXX_FLAGS "-fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
 #set(CMAKE_CXX_FLAGS "-O3 -march=native -mtune=intel -msse4.2 -mavx2 -mfma -flto -fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fopenmp -flto -Wno-deprecated -Wenum-compare -std=c++17")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fopenmp -flto -Wno-deprecated -Wenum-compare -std=c++17")
+add_compile_options(-fopenmp -fPIC -Wno-deprecated -Wenum-compare)
+add_link_options(-fopenmp)
 
 ## Specify additional locations of header files
 include_directories(include ${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
@@ -283,27 +285,27 @@ target_link_libraries(${PROJECT_NAME}_image_generator
 
 # Rename targets to simplify their names.
 set_target_properties(${PROJECT_NAME}_test_grasp_image
-  PROPERTIES OUTPUT_NAME test_grasp_image PREFIX "")
+  PROPERTIES OUTPUT_NAME test_grasp_image PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 set_target_properties(${PROJECT_NAME}_cem_detect_grasps
-  PROPERTIES OUTPUT_NAME cem_detect_grasps PREFIX "")
+  PROPERTIES OUTPUT_NAME cem_detect_grasps PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 set_target_properties(${PROJECT_NAME}_detect_grasps
-  PROPERTIES OUTPUT_NAME detect_grasps PREFIX "")
+  PROPERTIES OUTPUT_NAME detect_grasps PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 set_target_properties(${PROJECT_NAME}_generate_candidates
-  PROPERTIES OUTPUT_NAME generate_candidates PREFIX "")
+  PROPERTIES OUTPUT_NAME generate_candidates PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 if(BUILD_DATA_GENERATION STREQUAL "ON")
   set_target_properties(${PROJECT_NAME}_generate_data
-    PROPERTIES OUTPUT_NAME generate_data PREFIX "")
+    PROPERTIES OUTPUT_NAME generate_data PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 set_target_properties(${PROJECT_NAME}_label_grasps
-  PROPERTIES OUTPUT_NAME label_grasps PREFIX "")
+  PROPERTIES OUTPUT_NAME label_grasps PREFIX "" INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 set_target_properties(${PROJECT_NAME}_grasp_detector
-  PROPERTIES OUTPUT_NAME gpd)
+  PROPERTIES OUTPUT_NAME gpd INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 
 # Set the location for library installation
