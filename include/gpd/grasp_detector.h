@@ -84,7 +84,6 @@ namespace gpd {
     // filtering parameters
     bool filter_grasps_; ///< if grasps are filtered based on the robot's workspace and the robot hand width
     bool filter_half_antipodal_; ///< if grasps are filtered based on being half-antipodal
-    std::vector<double> gripper_width_range_;
     int min_inliers_;   //minimum number of inliers per cluster; set to 0 to turn off clustering
 
     bool filter_approach_direction_;  // turn filtering on/off
