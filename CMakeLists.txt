@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(gpd)
-#set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost REQUIRED COMPONENTS
@@ -16,26 +15,13 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 # PCL
 find_package(PCL 1.9 REQUIRED)
-#find_package(PCL 1.8 REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 # OpenCV
 find_package(OpenCV REQUIRED)
-#find_package(OpenCV REQUIRED PATHS /usr/local NO_DEFAULT_PATH)
 
-## Set compiler optimization flags
-# set(CMAKE_CXX_FLAGS "-O3 -fopenmp -fPIC -Wno-deprecated -Wenum-compare -std=c++14")
-#set(CMAKE_CXX_FLAGS "-O3 -fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
-#set(CMAKE_CXX_FLAGS "-fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
-# set(CMAKE_CXX_FLAGS "-O3 -fopenmp -fPIC -Wno-deprecated -Wenum-compare")
-# set(CMAKE_CXX_FLAGS "-O3 -fopenmp -march=native -mfpmath=sse -funroll-loops -fPIC -Wno-deprecated -Wenum-compare") # no improvement
-# set(CMAKE_CXX_FLAGS "-frename-registers -Ofast -march=native -fopenmp -fPIC -Wno-deprecated -Wenum-compare") # no improvement
-
-#set(CMAKE_CXX_FLAGS "-fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
-#set(CMAKE_CXX_FLAGS "-O3 -march=native -mtune=intel -msse4.2 -mavx2 -mfma -flto -fopenmp -fPIC -Wno-deprecated -Wenum-compare -Wno-ignored-attributes -std=c++17")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fopenmp -flto -Wno-deprecated -Wenum-compare -std=c++17")
 add_compile_options(-fopenmp -fPIC -Wno-deprecated -Wenum-compare)
 add_link_options(-fopenmp)
 
@@ -54,12 +40,16 @@ if(USE_OPENVINO)
   include_directories(${InferenceEngine_INCLUDE_DIRS})
   link_directories(${InferenceEngine_LIBRARY_DIRS})
   add_definitions(-DUSE_OPENVINO)
-  get_filename_component(MODELS_DIR "models/openvino" ABSOLUTE)
+  get_filename_component(MODELS_DIR ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/models ABSOLUTE)
   configure_file(include/gpd/net/openvino_classifier.h.in gpd/net/openvino_classifier.h)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   set(classifier_src src/${PROJECT_NAME}/net/classifier.cpp src/${PROJECT_NAME}/net/openvino_classifier.cpp)
   set(classifier_dep ${InferenceEngine_LIBRARIES})
   message("Using OpenVINO")
+
+  install(DIRECTORY models/openvino/
+          DESTINATION share/${PROJECT_NAME}/models
+          )
 elseif(USE_CAFFE)
   find_package(Caffe)
   if (NOT Caffe_FOUND)
@@ -70,6 +60,11 @@ elseif(USE_CAFFE)
   add_definitions(-DUSE_CAFFE)
   set(classifier_src src/${PROJECT_NAME}/net/classifier.cpp src/${PROJECT_NAME}/net/caffe_classifier.cpp)
   set(classifier_dep ${Caffe_LIBRARIES} ${OpenCV_LIBRARIES})
+  message("Using Caffe")
+
+  install(DIRECTORY models/caffe
+          DESTINATION share/${PROJECT_NAME}/models
+          )
 elseif(USE_OPENCV)
   message(FATAL_ERROR "Not supported yet")
 else()
@@ -77,6 +72,7 @@ else()
   add_library(${PROJECT_NAME}_dense_layer src/${PROJECT_NAME}/net/dense_layer.cpp)
   set(classifier_src src/${PROJECT_NAME}/net/classifier.cpp src/${PROJECT_NAME}/net/eigen_classifier.cpp)
   set(classifier_dep ${PROJECT_NAME}_conv_layer ${PROJECT_NAME}_dense_layer ${OpenCV_LIBRARIES})
+  message("Using Eigen")
 endif()
 
 # Optional PCL GPU operations
@@ -312,3 +308,4 @@ set_target_properties(${PROJECT_NAME}_grasp_detector
 install(TARGETS ${PROJECT_NAME}_grasp_detector DESTINATION lib)
 
 install(DIRECTORY include/gpd DESTINATION include)
+
