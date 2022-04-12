@@ -88,10 +88,8 @@ std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
       double sqrt_num_inliers = sqrt((double)num_inliers);
       double conf_lb = mean - 2.576 * standard_deviation / sqrt_num_inliers;
       double conf_ub = mean + 2.576 * standard_deviation / sqrt_num_inliers;
-      printf("grasp %d, inliers: %d, ||position_delta||: %3.4f, ", i,
-             num_inliers, position_delta.norm());
-      printf("mean: %3.4f, STD: %3.4f, conf_int: (%3.4f, %3.4f)\n", mean,
-             standard_deviation, conf_lb, conf_ub);
+      printf("grasp %d, inliers: %d, ||position_delta||: %3.4f, ", i, num_inliers, position_delta.norm());
+      printf("mean: %3.4f, STD: %3.4f, conf_int: (%3.4f, %3.4f), full_antipodal: %d\n", mean, standard_deviation, conf_lb, conf_ub, (int)hand_list[i]->isFullAntipodal());
       std::unique_ptr<candidate::Hand> hand =
           std::make_unique<candidate::Hand>(*hand_list[i]);
       hand->setPosition(hand->getPosition() + position_delta);

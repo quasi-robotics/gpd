@@ -455,8 +455,8 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::selectGrasps(
 
   for (int i = 0; i < middle; i++) {
     hands_out.push_back(std::move(hands[i]));
-    printf(" grasp #%d, score: %3.4f, approach: [%f, %f, %f]\n", i, hands_out[i]->getScore(),
-           hands_out[i]->getApproach()[0], hands_out[i]->getApproach()[1], hands_out[i]->getApproach()[2]);
+    printf(" grasp #%d, score: %3.4f, approach: [%f, %f, %f], full_antipodal: %d, half_antipodal: %d\n", i, hands_out[i]->getScore(),
+           hands_out[i]->getApproach()[0], hands_out[i]->getApproach()[1], hands_out[i]->getApproach()[2], (int)hands_out[i]->isFullAntipodal(), (int)hands_out[i]->isHalfAntipodal());
   }
 
   return hands_out;
