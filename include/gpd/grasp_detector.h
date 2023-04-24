@@ -78,7 +78,7 @@ namespace gpd {
     double min_aperture_;
     double max_aperture_;
 
-    bool remove_plane_;
+    bool remove_plane_;    // remove support plane from point cloud to speed up image computations
     int batch_size_;
 
     // filtering parameters
@@ -91,7 +91,6 @@ namespace gpd {
     double thresh_rad_;             //angle in radians above which grasps are filtered
     // selection parameters
     int num_selected_; ///< the number of selected grasps
-    bool remove_plane_before_image_calculation_;    // remove support plane from point cloud to speed up image computations
     std::vector<double> workspace_grasps_;  ///< the workspace of the robot with
                                             /// respect to hand poses
 
