@@ -62,7 +62,7 @@ elseif(USE_CAFFE)
   set(classifier_dep ${Caffe_LIBRARIES} ${OpenCV_LIBRARIES})
   message("Using Caffe")
 
-  install(DIRECTORY models/caffe
+  install(DIRECTORY models/caffe/
           DESTINATION share/${PROJECT_NAME}/models
           )
 elseif(USE_OPENCV)
@@ -73,6 +73,10 @@ else()
   set(classifier_src src/${PROJECT_NAME}/net/classifier.cpp src/${PROJECT_NAME}/net/eigen_classifier.cpp)
   set(classifier_dep ${PROJECT_NAME}_conv_layer ${PROJECT_NAME}_dense_layer ${OpenCV_LIBRARIES})
   message("Using Eigen")
+
+  install(DIRECTORY models/lenet/
+	  DESTINATION share/${PROJECT_NAME}/models
+	  )
 endif()
 
 # Optional PCL GPU operations
