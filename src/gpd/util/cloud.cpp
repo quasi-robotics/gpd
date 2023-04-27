@@ -479,7 +479,7 @@ void Cloud::writeNormalsToFile(const std::string &filename,
 }
 
 void Cloud::calculateNormals(int num_threads, double radius) {
-  if (normals_.cols() == 0) {
+  if (true/*normals_.cols() == 0*/) {
     double t_gpu = omp_get_wtime();
     printf("Calculating surface normals ...\n");
     std::string mode;
