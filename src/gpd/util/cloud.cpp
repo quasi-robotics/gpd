@@ -74,8 +74,38 @@ Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
 
   normals_.resize(3, cloud->size());
   for (int i = 0; i < cloud->size(); i++) {
-    normals_.col(i) << cloud->points[i].normal_x, cloud->points[i].normal_y,
-        cloud->points[i].normal_z;
+    normals_.col(i) << cloud->points[i].normal_x, cloud->points[i].normal_y, cloud->points[i].normal_z;
+  }
+}
+
+Cloud::Cloud(const PointCloudRGBNormal::Ptr &cloud, int size_left_cloud,
+             const Eigen::Matrix3Xd &view_points)
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
+      view_points_(view_points) {
+  sample_indices_.resize(0);
+  samples_.resize(3, 0);
+
+  pcl::copyPointCloud(*cloud, *cloud_original_);
+  *cloud_processed_ = *cloud_original_;
+
+  // set the camera source matrix: (i,j) = 1 if point j is seen by camera i
+  if (size_left_cloud == 0)  // one camera
+  {
+    camera_source_ = Eigen::MatrixXi::Ones(1, cloud->size());
+  } else  // two cameras
+  {
+    int size_right_cloud = cloud->size() - size_left_cloud;
+    camera_source_ = Eigen::MatrixXi::Zero(2, cloud->size());
+    camera_source_.block(0, 0, 1, size_left_cloud) =
+        Eigen::MatrixXi::Ones(1, size_left_cloud);
+    camera_source_.block(1, size_left_cloud, 1, size_right_cloud) =
+        Eigen::MatrixXi::Ones(1, size_right_cloud);
+  }
+
+  normals_.resize(3, cloud->size());
+  for (int i = 0; i < cloud->size(); i++) {
+    normals_.col(i) << cloud->points[i].normal_x, cloud->points[i].normal_y, cloud->points[i].normal_z;
   }
 }
 
@@ -449,30 +479,32 @@ void Cloud::writeNormalsToFile(const std::string &filename,
 }
 
 void Cloud::calculateNormals(int num_threads, double radius) {
-  double t_gpu = omp_get_wtime();
-  printf("Calculating surface normals ...\n");
-  std::string mode;
+  if (normals_.cols() == 0) {
+    double t_gpu = omp_get_wtime();
+    printf("Calculating surface normals ...\n");
+    std::string mode;
 
-#if defined(USE_PCL_GPU)
-  calculateNormalsGPU();
-  mode = "gpu";
-#else
-  if (cloud_processed_->isOrganized()) {
-    calculateNormalsOrganized();
-    mode = "integral images";
-  } else {
-    printf("num_threads: %d\n", num_threads);
-    calculateNormalsOMP(num_threads, radius);
-    mode = "OpenMP";
+  #if defined(USE_PCL_GPU)
+    calculateNormalsGPU();
+    mode = "gpu";
+  #else
+    if (cloud_processed_->isOrganized()) {
+      calculateNormalsOrganized();
+      mode = "integral images";
+    } else {
+      printf("num_threads: %d\n", num_threads);
+      calculateNormalsOMP(num_threads, radius);
+      mode = "OpenMP";
+    }
+  #endif
+
+    t_gpu = omp_get_wtime() - t_gpu;
+    printf("Calculated %zu surface normals in %3.4fs (mode: %s).\n", normals_.cols(), t_gpu, mode.c_str());
   }
-#endif
-
-  t_gpu = omp_get_wtime() - t_gpu;
-  printf("Calculated %zu surface normals in %3.4fs (mode: %s).\n",
-         normals_.cols(), t_gpu, mode.c_str());
-  printf(
-      "Reversing direction of normals that do not point to at least one camera "
-      "...\n");
+  else
+    printf("Normals already exist, skipping re-calculation ...\n");
+    
+  printf("Reversing direction of normals that do not point to at least one camera ...\n");
   reverseNormals();
 }
 

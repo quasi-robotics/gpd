@@ -64,6 +64,7 @@ namespace util {
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloudXYZ;
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
 typedef pcl::PointCloud<pcl::PointNormal> PointCloudPointNormal;
+typedef pcl::PointCloud<pcl::PointXYZRGBNormal> PointCloudRGBNormal;
 typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
 
 /**
@@ -163,6 +164,15 @@ class Cloud {
    * \param view_points the origins of the cameras (size: 3 x k)
    */
   Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
+        const Eigen::Matrix3Xd &view_points);
+
+  /**
+   * \brief Constructor for a two cameras setup (left and right camera).
+   * \param cloud the point cloud with surface normals (of size n)
+   * \param size_left_cloud the size of the point cloud from the left camera
+   * \param view_points the origins of the cameras (size: 3 x k)
+   */
+  Cloud(const PointCloudRGBNormal::Ptr &cloud, int size_left_cloud,
         const Eigen::Matrix3Xd &view_points);
 
   /**
