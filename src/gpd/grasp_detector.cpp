@@ -396,6 +396,7 @@ GraspDetector::filterGraspsWorkspace(
 
     for (int j = 0; j < hands.size(); j++) {
       if (!is_valid(j)) {
+        printf("hand %d of set %d is not valid\n", j, i );
         continue;
       }
       double half_width = 0.5 * hand_geometry.outer_diameter_;
@@ -427,6 +428,8 @@ GraspDetector::filterGraspsWorkspace(
         is_valid(j) = true;
         remaining++;
       } else {
+        printf("filtering out grasp with xmin:%f, xmax:%f, ymin:%f, ymax:%f, zmin:%f, zmax:%f\n",
+        x.minCoeff(), x.maxCoeff(), y.minCoeff(), y.maxCoeff(), z.minCoeff(), z.maxCoeff() );
         is_valid(j) = false;
       }
     }
