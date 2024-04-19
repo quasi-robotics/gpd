@@ -330,7 +330,7 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
     printf("Found %d clusters.\n", (int)clusters.size());
     if (clusters.size() <= 3) {
       printf(
-          "Not enough clusters found! Adding all grasps from previous step.");
+          "Not enough clusters found (%zu)! Adding all grasps from previous step.", clusters.size());
       for (int i = 0; i < hands.size(); i++) {
         clusters.push_back(std::move(hands[i]));
       }
